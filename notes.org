@@ -1,0 +1,10 @@
+* Overview
+** Lisp
+** Meta-programming in Lisp
+** Programming with macros
+** CLOS
+** Meta-programming in CLOS
+** Slides with Common Lisp
+* References
+** Paul Graham's On Lisp
+** The art of the meta-object protocol
