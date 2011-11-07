@@ -1,7 +1,3 @@
-;; Some history about lisp
-
-(require 'cl-ppcre)
-
 ;; Playing with lists: (very important for meta-programming)
 ;; - creating lists
 ;; - studying it (first, car, cdr...)

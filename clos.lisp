@@ -54,9 +54,12 @@
   (plain string)
   (plain "\\end{langc}\\vspace{-1em}"))
 
-(defun deck-output-slide (slide &key (title nil))
+(defun deck-output-slide (slide &key (title nil) (pause nil))
   (plain (format nil "\\begin{frame}[fragile,plain]~a" (if title (format nil "{~a}" title) "")))
-  (mapcar #'eval slide)
+  (dolist (builder slide)
+    (eval builder)
+    (when pause
+      (pause)))
   (plain "\\end{frame}")
   (plain ""))
 
@@ -92,6 +95,15 @@
 - creating lists
 - studying it (first, car, cdr...)
 - adding/removing elements"))
+
+(slide 
+ :title "Playing with lists"
+ :pause t
+ (lisp (list 1 2 3) :answer t)
+ (lisp '(1 2 3) :answer t)
+ (lisp (car '(1 2 3)) :answer t)
+ (lisp (cdr '(1 2 3)) :answer t)
+ (lisp (first '(1 2 3)) :answer t))
 
 (slide 
  (lisp (+ 1 2) :answer t)
