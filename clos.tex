@@ -1,4 +1,4 @@
-\documentclass[14pt]{beamer}
+\documentclass[14pt,utf8x]{beamer}
 
 \mode<presentation>
 {
@@ -11,17 +11,16 @@
   \setbeamertemplate{navigation symbols}{} % Pas de barre de navigation
 }
 
-\usepackage{graphicx}
 \usepackage[english]{babel}
-\usepackage[utf8]{inputenc}
 \usepackage{times}
 \usepackage[T1]{fontenc}
 
 \usepackage{listings}
 
+\lstdefinelanguage[CommonLisp]{Lisp}[]{Lisp}{morekeywords={cdr,car}}
+
 \alt<presentation>
 {\lstset{%
-    language=Lisp,
     basicstyle=\ttfamily,
     commentstyle=\slshape\color{green!50!black},
     keywordstyle=\bfseries\color{orange},
@@ -35,6 +34,7 @@
 
 \lstnewenvironment{lisp}{%
 	\lstset{
+          language=[CommonLisp]Lisp
 	}
 }{}
 
@@ -49,11 +49,12 @@
 
 \lstnewenvironment{langc}{%
 	\lstset{
-          language=C
+          language=C,
+          escapechar=\#
 	}
 }{}
 
-\newcommand{\ct}{\lstinline[mathescape=false,backgroundcolor=\color{white},basicstyle={\ttfamily}]}
+\newcommand{\ct}{\lstinline[language={[CommonLisp]Lisp},mathescape=false,backgroundcolor=\color{white},basicstyle={\ttfamily}]}
 
 \graphicspath{{figures/}} 
 \newcommand{\fig}[2]{ 

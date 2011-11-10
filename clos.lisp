@@ -1,61 +1,177 @@
-
 (slide
  (plain "\\titlepage"))
 
 (slide :title "Common Lisp History"
- (plain "should talk about lisp history"))
+       (plain "should talk about lisp history"))
 
 (slide
  :title "Syntax"
+ :pause nil
  (slisp "(function-name arg1 arg2 ... argn)" :prompt nil)
  (text "")
  (pause)
  (lisp (+ 1 2) :answer t))
 
 (slide 
- :title "Creating lists"
- :pause t
+ :title "Creating Lists"
  :answer t
- (lisp (cons 3 nil))
+ (lisp (cons 3 '()))
+ (lisp (cons 2 (3)) :answer nil  :eval nil)
+ (text "Impossible as \\ct{3} is not a function")
  (lisp (cons 2 '(3)))
  (lisp (cons 1 '(2 3)))
  (lisp (list 1 2 3))
  (lisp '(1 2 3)))
 
 (slide
- :title "Studying lists"
+ :title "Studying Lists"
  :answer t
- :pause t
  (lisp (car '(1 2 3)))
  (lisp (cdr '(1 2 3)))
  (lisp (first '(1 2 3)))
+ (lisp (last '(1 2 3) 2))
  (lisp (last '(1 2 3))))
 
 (slide
+ :title "Creating Functions"
+ :answer t
  (slisp 
-"(defun mult2 (x)
+  "(defun mult2 (x)
   \"Multiplies x by 2\"
   (* x 2))
-" :answer t)
- (pause)
- (lisp (mult2 3) :answer t))
+")
+ (text "\\ct{defun} is itself a function, it creates functions")
+ (lisp (mult2 3)))
 
 (slide
+ :title "Studying Functions"
+ ;; "Evaluate this but does not show anything on the slide"
+  (defun mult2 (x)
+    "Multiplies x by 2"
+    (* x 2))
  (lisp (describe mult2))
- (pause)
  (text "Impossible because \\ct{mult2} is not a variable")
- (pause)
+ (lisp #'mult2 :answer t)
  (lisp (describe #'mult2) :answer 
-"(defun mult2 (x)
-  \"Multiplies x by 2\"
-   (* x 2))
-"))
+       '(defun mult2 (x)
+	 "Multiplies x by 2"
+	 (* x 2))))
 
 (slide
- (clang "int mult2 (int c) { return c * 2; }")
-(pause)
-(clang "
-int main(void) {
+ :title "Calling Functions"
+ :answer t
+ ;; Evaluate this but does not show anything on the slide
+ (defun mult2 (x)
+   "Multiplies x by 2"
+   (* x 2))
+ (lisp (funcall #'mult2 3))
+ (lisp (defvar fmult2 #'mult2))
+ (lisp (funcall fmult2 3)))
+
+(slide
+ :title "Summary"
+ :pause t
+ (text "In Lisp it is possible to:
+\\begin{itemize}
+\\item define new functions,
+\\item retrieve a function by name,
+\\item reference a function from a variable,
+\\item call a function from a variable.
+\\end{itemize}")
+ (text "This is very similar to pointer manipulation in C"))
+
+(slide
+ :title "Function Pointer Manipulation in C"
+ (clang "int mult2 (int c) {
+ return c * 2;
+}")
+ (pause)
+ (text "")
+ (clang "int main(void) {
   int (*fmult2) (int) = mult2;
-  printf(\"%d\n\", (*fmult2)(3));
+  (*fmult2)(3);
 }"))
+
+(slide
+ :title "Generating new Functions"
+ :answer t
+ ;; Evaluate this but does not show anything on the slide
+ (defun mult2 (x)
+   "Multiplies x by 2"
+   (* x 2))
+ (lisp (get-source 'mult2))
+ (text "don't try this at home!"))
+
+(slide
+ :title "Generating new Functions"
+ :answer t
+ ;; Evaluate this but does not show anything on the slide
+ (defun mult2 (x)
+   "Multiplies x by 2"
+   (* x 2))
+ (slisp "(defvar smult2
+   (third (get-source 'mult2)))")
+ (lisp smult2))
+
+(slide
+ :title "Generating new Functions"
+ :pause t 
+ :answer t
+ (defun mult2 (x)
+   "Multiplies x by 2"
+   (* x 2))
+ (defvar smult2
+   (third (get-source 'mult2)))
+ (lisp (first smult2))
+ (lisp (second smult2))
+ (lisp (third smult2))
+ (lisp (fourth smult2))
+ (lisp (fifth smult2)))
+
+(slide
+ :title "Generating new Functions"
+ :answer t
+ (defun mult2 (x)
+   "Multiplies x by 2"
+   (* x 2))
+ (defvar smult2
+   (third (get-source 'mult2)))
+ (slisp "(defvar smult10
+   (copy-list smult2))")
+ (lisp (nsubstitute 10 2 (fifth smult10)))
+ (lisp smult10))
+
+(slide
+ :title "Generating new Functions"
+ :answer t
+ (defvar smult10 '(defun mult2 (x) "Multiplies x by 2" (* x 10)))
+ (lisp smult10)
+ (slisp "(nsubstitute 'mult10 'mult2
+             smult10)"))
+
+(slide
+ :title "Generating new Functions"
+ :answer t
+ (defvar smult10 '(defun mult10 (x) "Multiplies x by 2" (* x 10)))
+ (lisp smult10)
+ (slisp "(setf (fourth smult10)
+      (cl-ppcre:regex-replace \"2\"
+        (fourth smult10) \"10\"))"))
+
+(slide
+ :title "Generating new Functions"
+ :answer t
+ (defvar smult10 '(defun mult10 (x) "Multiplies x by 10" (* x 10)))
+ (lisp smult10)
+ (lisp (eval smult10))
+ (lisp (mult10 3)))
+
+(slide
+ :title "Summary"
+ (text "\\begin{itemize}
+\\item A function definition in Lisp is a list. 
+\\item This list can
+be studied like any list.
+\\item New functions can be created from a list.
+\\end{itemize}"))
+

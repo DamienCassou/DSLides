@@ -18,7 +18,7 @@
 
 (defun answer (obj)
   (plain "\\begin{answer}")
-  (plain (format nil "~a" obj))
+  (plain (format nil "~s" obj))
   (plain "\\end{answer}\\vspace{-1em}"))
 
 (defun slisp (string &key (answer nil) (eval nil) (prompt t))
@@ -50,7 +50,7 @@
 	  (otherwise (answer answer))))))
 
 (defmacro lisp (list &rest args)
-  `(apply #'slisp (list ,(format nil "~a" list) ,@args)))
+  `(apply #'slisp (list ,(format nil "~s" list) ,@args)))
 
 (defun pause ()
   (plain "\\pause"))
@@ -60,12 +60,24 @@
   (plain string)
   (plain "\\end{langc}\\vspace{-1em}"))
 
-(defun deck-output-slide (slide &key (title nil) (pause nil) (answer nil))
-  (plain (format nil "\\begin{frame}[fragile,plain]~a" (if title (format nil "{~a}" title) "")))
-  (dolist (builder slide)
-    (eval (if (and answer (equal 'lisp (car builder))) (append builder '(:answer t)) builder))
-    (when pause
-      (pause)))
+(defun visual-builderp (builder)
+  (or (member (car builder) '(slisp lisp))
+      (and (equal (car builder) 'text)
+	   (not (equal (cadr builder) "")))))
+
+(defun answerable-builderp (builder)
+  (member (car builder) '(slisp lisp)))
+
+(defun deck-output-slide (slide &key (title nil) (pause t) (answer nil))
+  (plain (format nil "\\begin{frame}[fragile,plain]~a"
+		 (if title (format nil "{~a}" title) "")))
+  (dotimes (i (length slide))
+    (let ((builder (nth i slide)))
+      (eval (if (and answer (answerable-builderp builder) (not (member ':answer builder)))
+		(append builder '(:answer t))
+		builder))
+      (when (and pause (visual-builderp builder) (< (1+ i) (length slide)))
+	(pause))))
   (plain "\\end{frame}")
   (plain ""))
 
@@ -73,8 +85,8 @@
   (let ((*stream* stream))
     (mapcar (lambda (slide)
 	      (apply #'deck-output-slide ; (cons (cdr slide) (car slide))))
-		     (cons (remove-if-not #'listp slide)
-			   (remove-if #'listp slide))))
+		     (cons (remove-if-not #'consp slide)
+			   (remove-if #'consp slide))))
 	    (reverse *deck*))))
 
 (defun deck-real-output ()
@@ -88,7 +100,7 @@
 (defun slide-real-output (slide)
   (let ((*deck* (cons slide nil)))
     (deck-real-output)))
-			 
+
 (defun deck-string-output ()
   (with-open-stream (stream (make-string-output-stream))
     (deck-output stream)
