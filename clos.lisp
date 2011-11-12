@@ -43,12 +43,12 @@
  (text "\\ct{defun} is itself a function, it creates functions")
  (lisp (mult2 3)))
 
+(defun mult2 (x)
+  "Multiplies x by 2"
+  (* x 2))
+
 (slide
  :title "Studying Functions"
- ;; "Evaluate this but does not show anything on the slide"
-  (defun mult2 (x)
-    "Multiplies x by 2"
-    (* x 2))
  (lisp (describe mult2))
  (text "Impossible because \\ct{mult2} is not a variable")
  (lisp #'mult2 :answer t)
@@ -60,10 +60,6 @@
 (slide
  :title "Calling Functions"
  :answer t
- ;; Evaluate this but does not show anything on the slide
- (defun mult2 (x)
-   "Multiplies x by 2"
-   (* x 2))
  (lisp (funcall #'mult2 3))
  (lisp (defvar fmult2 #'mult2))
  (lisp (funcall fmult2 3)))
@@ -95,20 +91,12 @@
 (slide
  :title "Generating new Functions"
  :answer t
- ;; Evaluate this but does not show anything on the slide
- (defun mult2 (x)
-   "Multiplies x by 2"
-   (* x 2))
  (lisp (get-source 'mult2))
  (text "don't try this at home!"))
 
 (slide
  :title "Generating new Functions"
  :answer t
- ;; Evaluate this but does not show anything on the slide
- (defun mult2 (x)
-   "Multiplies x by 2"
-   (* x 2))
  (slisp "(defvar smult2
    (third (get-source 'mult2)))")
  (lisp smult2))
@@ -117,9 +105,6 @@
  :title "Generating new Functions"
  :pause t 
  :answer t
- (defun mult2 (x)
-   "Multiplies x by 2"
-   (* x 2))
  (defvar smult2
    (third (get-source 'mult2)))
  (lisp (first smult2))
@@ -131,9 +116,6 @@
 (slide
  :title "Generating new Functions"
  :answer t
- (defun mult2 (x)
-   "Multiplies x by 2"
-   (* x 2))
  (defvar smult2
    (third (get-source 'mult2)))
  (slisp "(defvar smult10
