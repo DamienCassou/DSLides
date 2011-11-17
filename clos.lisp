@@ -157,3 +157,14 @@ be studied like any list.
 \\item New functions can be created from a list.
 \\end{itemize}"))
 
+(slide
+ :title "Beyond Functions"
+ :pause nil
+ (text "How would you implement \\ct{actWhen} that executes its
+ \\ct{body} \\emph{when} its \\ct{condition} becomes true?")
+ (slisp "(actWhen condition body)" :answer nil))
+
+(slide
+ :title "actWhen: With a Function"
+ 
+
