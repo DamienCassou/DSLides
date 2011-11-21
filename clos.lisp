@@ -91,7 +91,11 @@
 (slide
  :title "Generating new Functions"
  :answer t
- (lisp (get-source 'mult2))
+ (lisp (get-source 'mult2)
+       :answer "(nil nil 
+  (defun mult2 (x)
+    \"Multiplies x by 2\"
+    (* x 2)))")
  (text "don't try this at home!"))
 
 (slide
