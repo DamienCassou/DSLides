@@ -160,11 +160,6 @@ be studied like any list.
 (slide
  :title "Beyond Functions"
  :pause nil
- (text "How would you implement \\ct{actWhen} that executes its
- \\ct{body} \\emph{when} its \\ct{condition} becomes true?")
- (slisp "(actWhen condition body)" :answer nil))
-
-(slide
- :title "actWhen: With a Function"
- 
-
+ (text "How would you implement \\ct{while} that executes its
+  \\ct{body} \\emph{as long as} its \\ct{condition} stays true?")
+ (lisp (while condition body) :answer nil))
