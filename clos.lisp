@@ -177,3 +177,82 @@ be studied like any list.
  (text "How would you implement \\ct{while} that executes its
   \\ct{body} \\emph{as long as} its \\ct{condition} stays true?")
  (lisp (while condition body) :answer nil))
+
+(defvar usingwhile "(while (/= i 0)
+  (decf i)
+  (format t \"i is now: ~s~%\" i))")
+
+(slide
+ :title "The While Construct"
+ :pause nil
+ (lisp (setq i 10))
+ (slisp usingwhile)
+ (pause)
+ (answer "i is now: 9
+i is now: 8
+i is now: 7
+...
+i is now: 2
+i is now: 1
+i is now: 0" :notransform t))
+
+(slide
+ :title "The While Construct: Using Loop"
+ (lisp (setq i 10) :answer t)
+ (slisp "(loop 
+  (if (= i 0)
+    (return)
+    (progn
+      (decf i)
+      (format t \"i = ~s~%\" i))))" :answer nil))
+
+(slide
+ :title "The While Construct: Function"
+ (slisp usingwhile)
+ (slisp "(defun while (test &rest body)
+  (loop
+    (if (not test)
+        (return)
+        (progn body))))")
+ (text "doesn't work because parameters are evaluated immediately"))
+
+(slide
+ :title "The While Construct: Function"
+ (slisp "(while '(/= i 0)
+  '(decf i)
+  '(format t \"i is now: ~s~%\" i))")
+ (slisp "(defun while (test &rest body)
+  (loop
+    (if (not (eval test))
+        (return)
+        (mapcar #'eval body))))")
+ (text "works, but using \\ct{while} is less readable than intended"))
+
+(slide
+ :title "The While Construct: Macro"
+ (slisp usingwhile)
+ (slisp "(defmacro while (condition &body body)
+  `(loop
+     (if (not ,condition)
+	 (return)
+	 (progn ,@body))))")
+ (text "works fine"))
+
+(slide
+ :title "Using Macros in C"
+ (clang "#define MAX(a,b) ((a)>(b)?(a):(b));
+
+int
+main(void)
+{
+ printf(\"max(1,5)=%d\\n\", MAX(1,5));
+ printf(\"max(8,1)=%d\\n\", MAX(8,1));
+}"))
+
+(slide
+ :title "Summary"
+ (text "\\begin{itemize}
+\\item Arguments of functions are evaluated first.
+\\item To prevent evaluation, use \\ct{quote} (or \\ct{'}).
+\\item Macros can be used instead of functions for readability.
+\\end{itemize}"))
