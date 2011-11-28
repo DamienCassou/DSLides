@@ -15,7 +15,7 @@
 (slide 
  :title "Creating Lists"
  :answer t
- (lisp (cons 3 '()))
+ (lisp (cons 3 nil))
  (lisp (cons 2 (3)) :answer nil  :eval nil)
  (text "Impossible as \\ct{3} is not a function")
  (lisp (cons 2 '(3)))
@@ -61,6 +61,7 @@
 (slide
  :title "Calling Functions"
  :answer t
+ (lisp (mult2 3))
  (lisp (funcall #'mult2 3))
  (lisp (defvar fmult2 #'mult2))
  (lisp (funcall fmult2 3)))
@@ -101,7 +102,7 @@
 (slide
  :title "Generating new Functions"
  (slisp "(defvar smult2
-   (third (get-source 'mult2)))" :answer 'smult2)
+  (third (get-source 'mult2)))" :answer 'smult2)
  (defvar smult2 (read-from-string defmult2))
  (lisp smult2 :answer defmult2))
 
@@ -120,26 +121,33 @@
 (slide
  :title "Generating new Functions"
  :answer t
- (defvar smult2
-   (third (get-source 'mult2)))
+ (setq smult2
+   (third (read-from-string defmult2)))
  (slisp "(defvar smult10
    (copy-list smult2))")
  (lisp (nsubstitute 10 2 (fifth smult10)))
- (lisp smult10))
+ (lisp smult10 :answer "(defun mult2 (x) 
+  \"Multiplies x by 2\"
+  (* x 10))"))
 
 (slide
  :title "Generating new Functions"
- :answer t
- (defvar smult10 '(defun mult2 (x) "Multiplies x by 2" (* x 10)))
- (lisp smult10)
+ (setq smult10 '(defun mult2 (x) "Multiplies x by 2" (* x 10)))
+ (lisp smult10  :answer "(defun mult2 (x) 
+  \"Multiplies x by 2\"
+  (* x 10))")
  (slisp "(nsubstitute 'mult10 'mult2
-             smult10)"))
+             smult10)"  :answer "(defun mult10 (x) 
+  \"Multiplies x by 2\"
+  (* x 10))"))
 
 (slide
  :title "Generating new Functions"
  :answer t
- (defvar smult10 '(defun mult10 (x) "Multiplies x by 2" (* x 10)))
- (lisp smult10)
+ (setq smult10 '(defun mult10 (x) "Multiplies x by 2" (* x 10)))
+ (lisp smult10 :answer "(defun mult10 (x) 
+  \"Multiplies x by 2\"
+  (* x 10))")
  (slisp "(setf (fourth smult10)
       (cl-ppcre:regex-replace \"2\"
         (fourth smult10) \"10\"))"))
@@ -147,8 +155,10 @@
 (slide
  :title "Generating new Functions"
  :answer t
- (defvar smult10 '(defun mult10 (x) "Multiplies x by 10" (* x 10)))
- (lisp smult10)
+ (setq smult10 '(defun mult10 (x) "Multiplies x by 10" (* x 10)))
+ (lisp smult10 :answer "(defun mult10 (x)
+  \"Multiplies x by 10\"
+  (* x 10))")
  (lisp (eval smult10))
  (lisp (mult10 3)))
 

@@ -16,9 +16,11 @@
   (plain string)
   (plain "\\end{block}"))
 
-(defun answer (obj)
+(defun answer (obj &key (notransform nil))
   (plain "\\begin{answer}")
-  (plain (format nil "~s" obj))
+  (if (and (not notransform) (stringp obj))
+      (plain (format nil "~s" obj))
+      (plain (format nil "~a" obj)))
   (plain "\\end{answer}\\vspace{-1em}"))
 
 (defun slisp (string &key (answer nil) (eval nil) (prompt t))
@@ -47,7 +49,7 @@
     (if answer
 	(case answer
 	  (t (answer result))
-	  (otherwise (answer answer))))))
+	  (otherwise (format t "~s~%" string) (answer answer :notransform (stringp answer)))))))
 
 (defmacro lisp (list &rest args)
   `(apply #'slisp (list ,(format nil "~s" list) ,@args)))
