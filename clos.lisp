@@ -302,3 +302,10 @@ i is now: 0" :notransform t))
  (lisp (defvar *ooClasses* nil) :answer t)
  (slisp "(defun reset-ooClasses ()
   (setf *ooClasses* nil))" :answer t))
+
+(setf *readtable* *my-readtable*)
+
+(slide
+ :title "dsfsdf"
+ (slisp [(defun reset-ooClasses ()
+	    (setf *ooClasses* nil))]))

@@ -129,3 +129,24 @@
 
 (defmacro slide (&rest body)
   `(push (quote ,body) *deck*))
+
+(defvar *my-readtable* (copy-readtable))
+
+(set-syntax-from-char #\] #\) *my-readtable*)
+
+(set-macro-character
+ #\[
+ (lambda (stream char)
+   (declare (ignore char))
+   (let ((reading
+	  (with-output-to-string (output)
+	    (loop
+	      (let ((c (read-char stream nil #\] t)))
+		(if (char= c #\])
+		    (return)
+		    (write-char c output)))))))
+     `(string-trim '(#\Space #\Tab #\Newline) ,reading)))
+ nil
+ *my-readtable*)
+
+(setf *readtable* *my-readtable*)
