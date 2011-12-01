@@ -57,6 +57,25 @@
 (defun pause ()
   (plain "\\pause"))
 
+(defun remove-keyword-params (seq)
+  "Useful when a function has both &rest and &key."
+  (unless (null seq)
+    (let ((head (car seq))
+	  (tail (cdr seq)))
+      (if (keywordp head)
+	  (remove-keyword-params (cdr tail))
+	  (cons head (remove-keyword-params tail))))))
+
+(defun itemize (&rest items &key (title "") &allow-other-keys)
+  (plain "\\begin{block}{}")
+  (plain title)
+  (plain "\\begin{itemize}")
+  (dolist (item (remove-keyword-params items) nil)
+    (unless (equal item "")
+      (plain (concatenate 'string "\\item " item))))
+  (plain "\\end{itemize}")
+  (plain "\\end{block}"))
+
 (defun clang (string)
   (plain "\\begin{langc}")
   (plain string)
@@ -64,7 +83,7 @@
 
 (defun visual-builderp (builder)
   (or (member (car builder) '(slisp lisp))
-      (and (equal (car builder) 'text)
+      (and (member (car builder) '(text itemize))
 	   (not (equal (cadr builder) "")))))
 
 (defun answerable-builderp (builder)

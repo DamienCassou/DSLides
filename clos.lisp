@@ -68,14 +68,12 @@
 
 (slide
  :title "Summary"
- :pause t
- (text "In Lisp it is possible to:
-\\begin{itemize}
-\\item define new functions,
-\\item retrieve a function by name,
-\\item reference a function from a variable,
-\\item call a function from a variable.
-\\end{itemize}")
+ (itemize
+  :title "In Lisp it is possible to:"
+  "define new functions,"
+  "retrieve a function by name,"
+  "reference a function from a variable,"
+  "call a function from a variable.")
  (text "This is very similar to pointer manipulation in C"))
 
 (slide
@@ -164,12 +162,10 @@
 
 (slide
  :title "Summary"
- (text "\\begin{itemize}
-\\item A function definition in Lisp is a list. 
-\\item This list can
-be studied like any list.
-\\item New functions can be created from a list.
-\\end{itemize}"))
+ (itemize "A function definition in Lisp is a list."
+	  "This list can be studied like any list."
+	  "New functions can be created from a list."
+	  ""))
 
 (slide
  :title "Beyond Functions"
@@ -181,6 +177,13 @@ be studied like any list.
 (defvar usingwhile "(while (/= i 0)
   (decf i)
   (format t \"i is now: ~s~%\" i))")
+
+(defvar usingloop "(loop 
+  (if (not (/= i 0))
+    (return)
+    (progn
+      (decf i)
+      (format t \"i = ~s~%\" i))))")
 
 (slide
  :title "The While Construct"
@@ -198,23 +201,22 @@ i is now: 0" :notransform t))
 
 (slide
  :title "The While Construct: Using Loop"
- (lisp (setq i 10) :answer t)
- (slisp "(loop 
-  (if (= i 0)
-    (return)
-    (progn
-      (decf i)
-      (format t \"i = ~s~%\" i))))" :answer nil))
+ :pause nil
+ (slisp usingwhile :answer nil)
+ (slisp usingloop :answer nil))
 
 (slide
  :title "The While Construct: Function"
+ :pause nil
  (slisp usingwhile)
  (slisp "(defun while (test &rest body)
   (loop
     (if (not test)
         (return)
         (progn body))))")
- (text "doesn't work because parameters are evaluated immediately"))
+ (pause)
+ (text "doesn't work because parameters are evaluated immediately")
+ (slisp "(while nil nil)" :answer nil))
 
 (slide
  :title "The While Construct: Function"
@@ -229,30 +231,74 @@ i is now: 0" :notransform t))
  (text "works, but using \\ct{while} is less readable than intended"))
 
 (slide
- :title "The While Construct: Macro"
- (slisp usingwhile)
- (slisp "(defmacro while (condition &body body)
-  `(loop
-     (if (not ,condition)
-	 (return)
-	 (progn ,@body))))")
- (text "works fine"))
-
-(slide
- :title "Using Macros in C"
- (clang "#define MAX(a,b) ((a)>(b)?(a):(b));
-
-int
-main(void)
-{
- printf(\"max(1,5)=%d\\n\", MAX(1,5));
- printf(\"max(8,1)=%d\\n\", MAX(8,1));
-}"))
-
-(slide
  :title "Summary"
- (text "\\begin{itemize}
-\\item Arguments of functions are evaluated first.
-\\item To prevent evaluation, use \\ct{quote} (or \\ct{'}).
-\\item Macros can be used instead of functions for readability.
-\\end{itemize}"))
+ (itemize "Arguments of functions are evaluated first."
+	  "To prevent evaluation, use \\ct{quote} (or \\ct{'})."
+	  "Use \\ct{eval} to evaluate an expression."
+	  ""))
+
+
+;; (slide
+;;  :title "Using Macros in C"
+;;  (clang "#define MAX(a,b) ((a)>(b)?(a):(b));
+
+;; int
+;; main(void)
+;; {
+;;  printf(\"max(1,5)=%d\\n\", MAX(1,5));
+;;  printf(\"max(8,1)=%d\\n\", MAX(8,1));
+;; }"))
+
+(slide
+ :title "Macros"
+ :pause nil
+ (itemize
+  :title "Macros are programs that write programs"
+  "they return lists representing Lisp code."
+  "they don't evaluate their arguments."
+  "they are evaluated at \\emph{compile time}."
+  ""))
+
+(slide
+ :title "The While Construct: Macro"
+ (slisp usingloop)
+ (slisp "(defmacro while (test &body body)
+  (list 'loop
+    (list 'if (list 'not test)
+      (list 'return)
+      (cons 'progn body))))"))
+
+(slide
+ :title "The While Construct: Macro"
+ :pause nil
+ (slisp usingloop)
+ (slisp "(defmacro while (test &body body)
+  `(loop
+     (if (not ,test)
+       (return)
+       (progn ,@body))))"))
+
+(slide
+ :title  "Creating an OO language"
+ (slisp "(defstruct ooclass
+   name
+   instVars
+   methods)" :answer t))
+
+(slide
+ :title "Creating an OO language"
+ (slisp "(defstruct ooObject
+   aClass
+   instValues)" :answer t))
+
+(slide
+ :title "Creating an OO language"
+ (slisp "(defstruct ooMethod
+  name
+  lambda)" :answer t))
+
+(slide
+ :title "Creating an OO language"
+ (lisp (defvar *ooClasses* nil) :answer t)
+ (slisp "(defun reset-ooClasses ()
+  (setf *ooClasses* nil))" :answer t))

@@ -2,6 +2,7 @@
 ** Lisp
 ** Meta-programming in Lisp
 ** Programming with macros
+*** create new constructs such as if, while...
 ** CLOS
 ** Meta-programming in CLOS
 ** Slides with Common Lisp

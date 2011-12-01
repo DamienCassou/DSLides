@@ -6,6 +6,12 @@
   (if (= i 0)
       (return)))
 
+(defmacro lwhile (condition &body body)
+  (list 'loop
+	(list 'if (list 'not condition)
+	 (list 'return)
+	 (cons 'progn body))))
+
 (defmacro while (condition &body body)
   `(loop
      (if (not ,condition)
