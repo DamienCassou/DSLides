@@ -138,14 +138,13 @@
  #\[
  (lambda (stream char)
    (declare (ignore char))
-   (let ((reading
-	  (with-output-to-string (output)
-	    (loop
-	      (let ((c (read-char stream nil #\] t)))
-		(if (char= c #\])
-		    (return)
-		    (write-char c output)))))))
-     `(string-trim '(#\Space #\Tab #\Newline) ,reading)))
+   (string-trim
+    '(#\Space #\Tab #\Newline)
+    (with-output-to-string (output)
+      (loop for c = (read-char stream t nil t)
+	    until (char= c #\]) do
+	      (write-char c output)))))
+
  nil
  *my-readtable*)
 
