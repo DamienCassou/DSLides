@@ -1,6 +1,8 @@
 (require 'cl-ppcre)
 (defparameter *stream* nil)
 (defparameter *deck* nil)
+(defparameter *current-title* nil)
+
 (setf *print-case* :downcase)
 
 (defun deck-reset () (setq *deck* nil))
@@ -90,11 +92,14 @@
   (member (car builder) '(slisp lisp)))
 
 (defun deck-output-slide (slide &key (title nil) (pause t) (answer nil))
-  (plain (format nil "\\begin{frame}[fragile,plain]~a"
-		 (if title (format nil "{~a}" title) "")))
+  (let ((theTitle (or title *current-title* "~")))
+    (plain (format nil "\\begin{frame}[fragile,plain]{~a}" theTitle))
+    (setf *current-title* theTitle))
   (dotimes (i (length slide))
     (let ((builder (nth i slide)))
-      (eval (if (and answer (answerable-builderp builder) (not (member ':answer builder)))
+      (eval (if (and answer
+		     (answerable-builderp builder)
+		     (not (member ':answer builder)))
 		(append builder '(:answer t))
 		builder))
       (when (and pause (visual-builderp builder) (< (1+ i) (length slide)))
@@ -105,7 +110,7 @@
 (defun deck-output (stream)
   (let ((*stream* stream))
     (mapcar (lambda (slide)
-	      (apply #'deck-output-slide ; (cons (cdr slide) (car slide))))
+	      (apply #'deck-output-slide
 		     (cons (remove-if-not #'consp slide)
 			   (remove-if #'consp slide))))
 	    (reverse *deck*))))
@@ -128,7 +133,7 @@
     (get-output-stream-string stream)))
 
 (defmacro slide (&rest body)
-  `(push (quote ,body) *deck*))
+  `(push ',body *deck*))
 
 (defvar *my-readtable* (copy-readtable))
 
@@ -149,3 +154,14 @@
  *my-readtable*)
 
 (setf *readtable* *my-readtable*)
+
+
+;; (2011-12-02 09:38:09) H4ns: 
+;; DamienCassou: for one, you could use a stream that keeps track of column and row (the sbcl has an example of that)
+;; (2011-12-02 09:38:25) 
+;; nostoi [~nostoi@109.Red-79-154-22.dynamicIP.rima-tde.net] entered the room.
+;; 09:39
+;; (2011-12-02 09:39:11) H4ns: 
+;; DamienCassou: or, and that was what i was thinking, you can just read the file into memory and post-process it one the reader is done with it (and told you, by the way of your macro, where in the file your expressions are located in the input file)
+;; (2011-12-02 09:39:47) H4ns: 
+;; DamienCassou: http://www.sbcl.org/manual/Character-counting-input-stream.html#Character-counting-input-stream
