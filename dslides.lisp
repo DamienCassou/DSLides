@@ -91,9 +91,11 @@
 (defun answerable-builderp (builder)
   (member (car builder) '(slisp lisp)))
 
-(defun deck-output-slide (slide &key (title nil) (pause t) (answer nil))
+(defun deck-output-slide (slide &key (title nil) (pause t) (answer nil) (plain nil))
   (let ((theTitle (or title *current-title* "~")))
-    (plain (format nil "\\begin{frame}[fragile,plain]{~a}" theTitle))
+    (plain (format nil "\\begin{frame}[fragile~a]{~a}"
+		   (if plain ",plain" "")
+		   theTitle))
     (setf *current-title* theTitle))
   (dotimes (i (length slide))
     (let ((builder (nth i slide)))
