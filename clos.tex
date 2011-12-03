@@ -2,19 +2,16 @@
 
 \mode<presentation>
 {
-  \usetheme{Singapore}           % Thème central.
-  \useoutertheme{}      % Utilise les en-têtes et pieds de pages
-                                 % d'un autre thème.
-  %\setbeamercovered{transparent} % Utilise la transparence plutôt que
-                                 % masquer complètement les éléments
-                                 % futurs.
+  \usetheme{hpimetaprogramming}           % Thème central.
   \setbeamertemplate{navigation symbols}{} % Pas de barre de navigation
 }
 
 \usepackage[english]{babel}
 \usepackage{times}
 \usepackage[T1]{fontenc}
-\usepackage[condensed,math]{iwona}
+
+\renewcommand{\rmdefault}{phv} % Arial
+\renewcommand{\sfdefault}{phv} % Arial
 
 \usepackage{listings}
 
@@ -64,15 +61,16 @@
   \end{figure}
 }
 
-\title{Meta-programming in Common Lisp}
-
-%\subtitle{Subtitle}
-
+\title{Metaprogramming and Reflection}
+\subtitle{Common Lisp}
 \author{Damien \textsc{Cassou}}
 
 \institute
 {
-Software Architecture Group
+Hasso-Plattner-Institut Potsdam\\
+Software Architecture Group\\
+Prof. Dr. Robert Hirschfeld\\
+\url{http://www.hpi.uni-potsdam.de/swa/}
 }
 
 \date{% \today{}
@@ -80,6 +78,7 @@ Software Architecture Group
 
 % Si vous avez un logo :
 %\titlegraphic{\includegraphics[scale=0.3]{esug}}
+\logo{\includegraphics[scale=0.5]{resources/hpi}}
 
 % \subject{Talks}
 
