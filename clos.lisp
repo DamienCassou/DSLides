@@ -1,6 +1,8 @@
 (setf *readtable* *my-readtable*)
 
 (slide
+ :plain t
+ :title ""
  (plain "\\titlepage"))
 
 (slide
@@ -444,7 +446,7 @@ i is now: 0" :notransform t))
 
 (slide
  :pause nil
- (text "As we also want to pass \\ct{this} as first argument to
+ (text "We also want to pass \\ct{this} as first argument to
  \\ct{call}:")
  (slisp [(defun call (obj name &rest params)
   (let* ((theObj 
