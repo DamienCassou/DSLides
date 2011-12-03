@@ -3,9 +3,6 @@
 (slide
  (plain "\\titlepage"))
 
-(slide :title "Common Lisp History"
-       (plain "should talk about lisp history"))
-
 (slide
  :title "Syntax"
  :pause nil
@@ -271,7 +268,6 @@ i is now: 0" :notransform t))
       (cons 'progn body))))]))
 
 (slide
- :title "The While Construct: Macro"
  :pause nil
  (slisp usingloop)
  (slisp [(defmacro while (test &body body)
@@ -282,38 +278,228 @@ i is now: 0" :notransform t))
 
 (slide
  :title  "Creating an OO language"
- (slisp [(defstruct ooclass
+ :answer nil
+ (slisp [(makeClass Speaker (name)
+  (makeMethod speak (sentence)
+    (format t
+      "Listen all of you: ~s~%"
+      sentence)))])
+ (slisp [(defvar alex
+        (new 'Speaker "Alex"))])
+ (slisp [(call alex 'speak "Hello World!")]
+	:answer "Listen all of you: \"Hello World!\"")
+ (lisp (getInstVar alex 'name) :answer "Alex"))
+
+(slide
+ (slisp [(makeClass Speaker ()
+  (makeMethod "..."))])
+ (itemize :title "A class is composed of:"
+	  "a name,"
+	  "some instance variables,"
+	  "and some method definitions."
+	  "")
+ (slisp [(defstruct cls
    name
-   instVars
-   methods)] :answer t))
+   vars
+   mths)]))
 
 (slide
- :title "Creating an OO language"
- (slisp [(defstruct ooObject
-   aClass
-   instValues)] :answer t))
+ :pause nil
+ (slisp [(makeClass Speaker ()
+  (makeMethod "..."))])
+ (plain "~")
+ (slisp
+  [(defmacro makeClass (name iVars
+                     &body meths)
+  (push
+     (make-cls
+       :name ',name
+       :vars ',iVars
+       :mths
+         ',(mapcar #'eval meths))
+     *classes*))]))
 
 (slide
- :title "Creating an OO language"
- (slisp [(defstruct ooMethod
+ (slisp [(makeMethod speak (sentence)
+  (format t "..." sentence))])
+ (itemize :title "A method is composed of:"
+	  "a name,"
+	  "some parameters,"
+	  "a body"
+	  "")
+ (slisp [(defstruct mth
   name
-  lambda)] :answer t))
+  lmbd)]))
 
 (slide
- :title "Creating an OO language"
- (lisp (defvar *ooClasses* nil) :answer t)
- (slisp [(defun reset-ooClasses ()
-  (setf *ooClasses* nil))] :answer t))
+ (slisp [(makeMethod speak (sentence)
+  (format t "..." sentence))])
+ (plain "~")
+ (slisp
+  [(defmacro makeMethod (name 
+             argNames &body body)
+  `(make-mth
+      :name ',name
+      :lmbd (lambda ,argNames
+                      ,@body)))]))
 
 (slide
- :title "dsfsdf"
- (slisp [(defun reset-ooClasses ()
-	    (setf *ooClasses* nil))]))
+ (slisp [(new 'Speaker "Alex")])
+ (itemize :title "An object is composed of:"
+	  "a reference to its class,"
+	  "some values for its instance variables")
+ (slisp [(defstruct obj
+   cls
+   values)]))
+
+(slide
+ (slisp [(call alex 'speak "Hello World!")]
+	:answer "Listen all of you: \"Hello World!\"")
+ (itemize :title "A call is a function with:"
+	  "the receiver object,"
+	  "a method to be executed,"
+	  "and a list of parameters." "")
+ (slisp [(defun call (obj name &rest params)
+	   "...")] :prompt nil))
+
+(slide
+ (slisp [(defun call (obj name &rest params)
+  (let* ((cls (obj-cls obj))
+     	   (mth (getMethod cls name)))
+      (apply (mth-lmbd mth)
+             params)))] :prompt nil)
+ (plain "~")
+ (slisp [(defun getMethod (cls name)
+  (find name (cls-mths cls)
+        :key #'mth-name))] :prompt nil))
+
+(defvar mappingInstVariables
+"
+  \\begin{tabular}{l|c|c|c|c|}
+    \\cline{2-5}
+    class: & $varname_1$ & $varname_2$ & $\\dots$ & $varname_n$ \\\\
+    \\cline{2-5}
+    \\multicolumn{5}{c}{~}\\\\
+    \\cline{2-5}
+    object: & $value_1$ & $value_2$ & $\\dots$ & $value_n$ \\\\
+    \\cline{2-5}
+  \\end{tabular}
+")
+
+(slide 
+ :pause nil
+ (lisp (getInstVar alex 'name) :answer "Alex")
+ (pause)
+ (itemize :title "Looking for an instance variable value from its name involves:"
+	  "getting the position of the name in the list of all instance variables of the class,"
+	  "taking the value at this position in the list of all values of the object.")
+ (plain mappingInstVariables))
+
+(slide
+ (plain mappingInstVariables)
+ (slisp
+  [(defun getInstVar (obj name)
+  (let* ((cls (obj-cls obj))
+         (vars (cls-vars cls))
+         (pos (position name vars)))
+    (nth pos (obj-values obj))))]
+  :prompt nil))
+
+(slide
+ :title "Handling this"
+ (text "An object must be able to get its instance variables and call
+ methods by using \\ct{this}.")
+ (slisp [(makeClass Speaker (name)
+  (makeMethod getName ()
+    (getInstVar 'this 'name)))])
+ (lisp (call alex 'getName) :answer "Alex")
+ (text "This requires the system to keep track of the \\emph{current object}.")
+ (lisp (defparameter *cur-obj* nil)))
+
+(slide
+ (slisp
+  [(defun getInstVar (obj name)
+  (let* ((theObj 
+            (if (equal obj 'this)
+                *cur-obj*
+                obj))
+         (cls (obj-cls theObj))
+         (vars (cls-vars cls))
+         (pos (position name vars)))
+    (nth pos (obj-values theObj))))]
+  :prompt nil)
+ (text "When is \\ct{*cur-obj*} updated?
+        \\uncover<3->{Before it is \\emph{used}!}\\\\
+        \\uncover<4->{As \\ct{this} is only used when a method is executed, the method \\ct{call} needs to do the updating job.}"))
+
+(slide
+ :pause nil
+ (text "The method \\ct{call} needs to do the updating job:")
+ (slisp [(defun call (obj name &rest params)
+  (let* ((cls (obj-cls obj))
+         (mth (getMethod cls name))
+         (*cur-obj* obj))
+      (apply (mth-lmbd mth)
+             params)))] :prompt nil))
+
+(slide
+ :pause nil
+ (text "As we also want to pass \\ct{this} as first argument to
+ \\ct{call}:")
+ (slisp [(defun call (obj name &rest params)
+  (let* ((theObj 
+            (if (equal obj 'this)
+                *cur-obj*
+                obj))
+          (cls (obj-cls theObj))
+     	  (mth (getMethod cls name)))
+      (setf *cur-obj* theObj)
+      (apply (mth-lmbd mth)
+             params)))] :prompt nil))
+
+(slide
+ :title  "Creating an OO language"
+ (itemize :title "Possible improvements:"
+	  "setting of instance variables"
+	  "inheritance"
+	  "constructors"
+	  "dedicated syntax"))
+ 
+(slide
+ :title "Creating Domain-Specific Languages"
+ :pause nil
+ (slisp [(makeClass Speaker (name)
+  (makeMethod speak (s)
+    (format t "I say: ~a" s))	   
+  (makeMethod getName ()
+    (call 'this 'speak "hi!")
+    (getInstVar 'this 'name)))] :prompt nil)
+ (plain "~")
+ (pause)
+ (slisp [(makeMethod getName ()
+    {c speak "hi!"}
+    {i name})] :prompt nil))
+
+(slide
+ :pause nil
+ (slisp ";; {c speak \"hi!\"} {i name}" :prompt nil)
+ (slisp [(set-macro-character #\{
+ (lambda (str c)
+   (declare (ignore c))
+   (let ((type (read-char str))
+         (l (read-delimited-list
+                         #\} str)))
+     (case type
+       (#\i `(getInstVar 'this
+                         ',(car l)))
+       (#\c `(call 'this
+                   ',(car l)
+                   ,@(cdr l)))))))] :prompt nil))
 
 (slide
  :title "Acknowledgments"
  (itemize
-  :title "Thanks to \\ct{#lisp} for all their answers to my numerous questions"
+  :title "Thanks to \\ct{#lisp} for all their help:"
   "akovalenko"
   "antifuchs"
   "H4ns"
