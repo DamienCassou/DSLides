@@ -51,8 +51,6 @@
 
 (slide
  :title "Studying Functions"
- (lisp (describe mult2))
- (text "Impossible because \\ct{mult2} is not a variable")
  (lisp #'mult2 :answer t)
  (lisp (describe #'mult2) :answer 
        [(defun mult2 (x)
@@ -96,7 +94,7 @@
 		     (defun mult2 (x)
 		       "Multiplies x by 2"
 		       (* x 2)))])
- (text "don't try this at home!"))
+ (text "requires ibcl"))
 
 (slide
  :title "Generating new Functions"
@@ -210,15 +208,43 @@ i is now: 0" :notransform t))
 (slide
  :title "The While Construct: Function"
  :pause nil
- (slisp usingwhile)
  (slisp [(defun while (test &rest body)
   (loop
     (if (not test)
         (return)
         (progn body))))])
+ (slisp usingwhile)
  (pause)
  (text "doesn't work because parameters are evaluated immediately")
- (slisp [(while nil nil)] :answer nil))
+ (slisp [(while t nil)] :answer nil))
+
+(slide 
+ :title "Function Evaluation in C"
+ :pause nil
+ (clang "int f(int c){printf(\"f\\n\");return c;}
+int g(int c){printf(\"g\\n\");return c;}
+int h(int c){printf(\"h\\n\");return c;}
+
+int main(void) {
+  f(g(h(1)));
+}")
+ (plain "~")
+ (pause)
+ (clang "h
+g
+f"))
+
+(slide
+ :title "The While Construct: Function"
+ :pause nil
+ (slisp [(defun while (test &rest body)
+  (loop
+    (if (not test)
+        (return)
+        (progn body))))])
+ (slisp usingwhile)
+ (text "doesn't work because parameters are evaluated immediately")
+ (slisp [(while t nil)] :answer nil))
 
 (slide
  :title "The While Construct: Function"
@@ -239,27 +265,6 @@ i is now: 0" :notransform t))
 	  "Use \\ct{eval} to evaluate an expression."
 	  ""))
 
-;; (slide
-;;  :title "Using Macros in C"
-;;  (clang "#define MAX(a,b) ((a)>(b)?(a):(b));
-
-;; int
-;; main(void)
-;; {
-;;  printf(\"max(1,5)=%d\\n\", MAX(1,5));
-;;  printf(\"max(8,1)=%d\\n\", MAX(8,1));
-;; }"))
-
-(slide
- :title "Macros"
- :pause nil
- (itemize
-  :title "Macros are programs that write programs"
-  "they return lists representing Lisp code."
-  "they don't evaluate their arguments."
-  "they are evaluated at \\emph{compile time}."
-  ""))
-
 (slide
  :title "The While Construct: Macro"
  (slisp usingloop)
@@ -279,6 +284,16 @@ i is now: 0" :notransform t))
        (progn ,@body))))]))
 
 (slide
+ :title "Macros"
+ :pause nil
+ (itemize
+  :title "Macros are programs that write programs"
+  "they return lists representing Lisp code."
+  "they don't evaluate their arguments."
+  "they are evaluated at \\emph{compile time}."
+  ""))
+
+(slide
  :title  "Creating an OO language"
  :answer nil
  (slisp [(makeClass Speaker (name)
@@ -286,8 +301,7 @@ i is now: 0" :notransform t))
     (format t
       "Listen all of you: ~s~%"
       sentence)))])
- (slisp [(defvar alex
-        (new 'Speaker "Alex"))])
+ (slisp [(defvar alex (new 'Speaker "Alex"))])
  (slisp [(call alex 'speak "Hello World!")]
 	:answer "Listen all of you: \"Hello World!\"")
  (lisp (getInstVar alex 'name) :answer "Alex"))
@@ -359,7 +373,7 @@ i is now: 0" :notransform t))
 	:answer "Listen all of you: \"Hello World!\"")
  (itemize :title "A call is a function with:"
 	  "the receiver object,"
-	  "a method to be executed,"
+	  "a method name,"
 	  "and a list of parameters." "")
  (slisp [(defun call (obj name &rest params)
 	   "...")] :prompt nil))
@@ -486,17 +500,174 @@ i is now: 0" :notransform t))
  :pause nil
  (slisp ";; {c speak \"hi!\"} {i name}" :prompt nil)
  (slisp [(set-macro-character #\{
- (lambda (str c)
-   (declare (ignore c))
+ (lambda (str)
    (let ((type (read-char str))
          (l (read-delimited-list
                          #\} str)))
      (case type
-       (#\i `(getInstVar 'this
-                         ',(car l)))
-       (#\c `(call 'this
-                   ',(car l)
-                   ,@(cdr l)))))))] :prompt nil))
+      (#\c `(call 'this
+                  ',(car l)
+                  ,@(cdr l)))
+      (#\i `(getInstVar 'this
+                        ',(car l)))))))] :prompt nil))
+
+(slide
+ :title "Summary"
+ (itemize
+  "Lisp has powerful functions to manipulate lists."
+  "Lisp source code is made of lists."
+  "As a result, meta-programming is made easy." ""))
+
+(slide
+ (itemize :title "Macros"
+  "can be used to create source code,"
+  "don't evaluate their arguments,"
+  "are evaluated at compile time." "")
+ (text "Macros are programs that write programs.")
+ (text "Macros can also be used to install a new syntax."))
+
+(slide
+ :title "A Glimpse at CLOS"
+ :answer t
+ (slisp [(defclass circle ()
+  (radius center))])
+ (lisp (make-instance 'circle)))
+
+(slide
+ :answer t
+ (slisp [(defclass circle ()
+  ((radius :accessor circle-radius)
+   (center :accessor circle-center)))])
+ (lisp (setf c (make-instance 'circle)))
+ (lisp (setf (circle-radius c) 6))
+ (lisp (circle-radius c)))
+
+(slide
+ :answer t
+ (slisp [(defclass circle ()
+  ((radius :accessor circle-radius
+           :initarg :radius)
+   (center :accessor circle-center
+           :initarg :center)))])
+  (slisp [(setf c (make-instance 'circle
+                         :radius 6))])
+  (lisp (circle-radius c)))
+
+(slide
+ :answer t
+ (defclass circle ()
+   ((radius :accessor circle-radius
+	    :initarg :radius)
+    (center :accessor circle-center
+	    :initarg :center)))
+ (slisp [(defmethod area ((c circle))
+  (* pi (expt (circle-radius c) 2)))]
+ :eval t :answer "#<standard-method area (circle)>")
+ (slisp [(setf c (make-instance 'circle
+                         :radius 6))])
+ (lisp (area c)))
+
+(slide 
+ :title "Auxiliary methods"
+ :answer nil
+ (defclass circle ()
+   ((radius :accessor circle-radius
+	    :initarg :radius)
+    (center :accessor circle-center
+	    :initarg :center)))
+ (setf c (make-instance 'circle
+			  :radius 6))
+ (slisp [(defmethod area ((c circle))
+  (* pi (expt (circle-radius c) 2)))] :eval t)
+ (slisp [(defmethod area :before ((c circle))
+  (format t "I'm tired..."))] :eval t)
+ (lisp (area c) :answer "I'm tired...
+113.09733552923255d0"))
+
+(slide
+ :answer nil
+ (defclass circle ()
+   ((radius :accessor circle-radius
+	    :initarg :radius)
+    (center :accessor circle-center
+	    :initarg :center)))
+ (lisp (setf cache nil) :prompt nil)
+ (slisp [(defun from-cache (c)
+  (find (circle-radius c) cache
+        :key #'car))] :prompt nil)
+ (slisp [(defun to-cache (c area)
+  (push (cons (circle-radius c) area)
+        cache)
+  area)] :prompt nil))
+
+
+(slide
+ :answer t
+ (defclass circle ()
+   ((radius :accessor circle-radius
+	    :initarg :radius)
+    (center :accessor circle-center
+	    :initarg :center)))
+ (setf c (make-instance 'circle
+			  :radius 6))
+ (defmethod area ((c circle))
+   (* pi (expt (circle-radius c) 2)))
+ (defmethod area :before ((c circle))
+   (format t "I'm tired..."))
+ (setf cache nil)
+ (defun to-cache (c area)
+   (push (cons (circle-radius c) area) cache)
+   area)
+ (defun from-cache (c)
+   (find (circle-radius c) cache
+	 :key #'car))
+ (slisp [(defmethod area :around ((c circle))
+ (let ((value (from-cache c)))
+  (if value
+   (progn
+     (princ "Using the cache :-)")
+     (cdr value))
+   (progn
+     (princ "So tired...")
+     (to-cache c (call-next-method))))))]
+	:answer nil :eval t :prompt nil)
+ (lisp (area c) :eval t :answer "So tired...I'm tired...
+113.09733552923255d0"))
+
+(slide
+ :answer t
+ (defclass circle ()
+   ((radius :accessor circle-radius
+	    :initarg :radius)
+    (center :accessor circle-center
+	    :initarg :center)))
+ (setf c (make-instance 'circle
+			  :radius 6))
+ (defmethod area ((c circle))
+   (* pi (expt (circle-radius c) 2)))
+ (defmethod area :before ((c circle))
+   (format t "I'm tired..."))
+ (setf cache nil)
+ (defun to-cache (c area)
+   (push (cons (circle-radius c) area) cache)
+   area)
+ (defun from-cache (c)
+   (find (circle-radius c) cache
+	 :key #'car))
+ (defmethod area :around ((c circle))
+ (let ((value (from-cache c)))
+  (if value
+   (progn
+     (princ "Using the cache :-)")
+     (cdr value))
+   (progn
+     (princ "So tired...")
+     (to-cache c (call-next-method))))))
+ (lisp (area c) :eval t :answer "So tired...I'm tired...
+113.09733552923255d0")
+ (lisp (area c) :eval t :answer "Using the cache :-)
+113.09733552923255d0"))
+
 
 (slide
  :title "Acknowledgments"
