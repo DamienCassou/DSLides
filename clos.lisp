@@ -671,6 +671,7 @@ f"))
 
 (slide
  :title "Acknowledgments"
+ :pause nil
  (itemize
   :title "Thanks to \\ct{#lisp} for all their help:"
   "akovalenko"
@@ -680,5 +681,7 @@ f"))
   "pjb"
   "prxb"
   "ThomasH"
-  ""))
+  "")
+ (plain "\\vspace{-1em}")
+ (text "https://github.com/DamienCassou/DSLides"))
   
