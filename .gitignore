@@ -1,4 +1,4 @@
-/auto/clos.el
+/auto
 /clos.aux
 /clos.log
 /clos.nav
@@ -6,10 +6,7 @@
 /clos.snm
 /clos.toc
 /clos.vrb
-/exemple-c/ex1
 /slides-output.tex
 /compile.tmp
 /one-slide.tmp
-/#slides-output.tex#
-/exemple-c/macro
-/exemple-c/ex2
+/README.html
