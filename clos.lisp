@@ -347,7 +347,7 @@ f"))
  (slisp
   [(defmacro makeClass (name iVars
                      &body meths)
-  (push
+  `(push
      (make-cls
        :name ',name
        :vars ',iVars
@@ -688,7 +688,6 @@ f"))
  (lisp (area c) :eval t :answer "Using the cache :-)
 113.09733552923255d0"))
 
-
 (slide
  :title "Acknowledgments"
  :pause nil
@@ -704,4 +703,3 @@ f"))
   "")
  (plain "\\vspace{-1em}")
  (text "https://github.com/DamienCassou/DSLides"))
-  

@@ -22,8 +22,7 @@
 
 \mode<presentation>
 {
-  \usetheme{hpimetaprogramming}           % Thème central.
-  \setbeamertemplate{navigation symbols}{} % Pas de barre de navigation
+  \usetheme{hpimetaprogramming}
 }
 
 \usepackage[english]{babel}
@@ -72,15 +71,6 @@
 
 \newcommand{\ct}{\lstinline[language={[CommonLisp]Lisp},mathescape=false,backgroundcolor=\color{white},basicstyle={}]}
 
-\graphicspath{{figures/}} 
-\newcommand{\fig}[2]{ 
-  \begin{figure}
-    \begin{center}
-      \includegraphics[width=#1\textwidth]{#2}
-    \end{center}
-  \end{figure}
-}
-
 \title{Metaprogramming and Reflection}
 \subtitle{Common Lisp}
 \author{Damien \textsc{Cassou}}
@@ -96,28 +86,7 @@ Prof. Dr. Robert Hirschfeld\\
 \date{% \today{}
 }
 
-% Si vous avez un logo :
-%\titlegraphic{\includegraphics[scale=0.3]{esug}}
 \logo{\includegraphics[scale=0.5]{resources/hpi}}
-
-% \subject{Talks}
-
-\AtBeginSection[]
-{
-  \begin{frame}<beamer>
-    \frametitle{Outline}
-    \tableofcontents[currentsection,currentsubsection]
-  \end{frame}
-}
-
-\AtBeginSubsection[]
-{
-  \begin{frame}<beamer>
-    \frametitle{Outline}
-    \tableofcontents[currentsection,currentsubsection]
-  \end{frame}
-}
-
 
 \begin{document}
 
