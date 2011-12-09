@@ -23,7 +23,9 @@ This project is hosted as a
 
 This project is mainly a demonstration that Common Lisp can be used to
 create Domain-Specific Languages (DSL). I created this project for a
-lecture on
+lecture (available on
+[slideshare](http://www.slideshare.net/DamienCassou/metaprogramming-and-reflection-in-common-lisp))
+on
 [metaprogramming and reflection](http://www.hpi.uni-potsdam.de/studium/lehrangebot/lehrangebot0/veranstaltung/meta_programming_reflection-3.html?L=1&cHash=e1cc090b265a6a818f89e787323464d8)
 in Common Lisp (December 8th, 2011, at the Hasso-Plattner-Institute,
 Potsdam, Germany). I'm certainly not an expert in Common Lisp, far
