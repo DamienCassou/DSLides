@@ -691,15 +691,22 @@ f"))
 (slide
  :title "Acknowledgments"
  :pause nil
+ (text  "Thanks to \\ct{#lisp} for all their help:")
+ (plain "\\vspace{-1em}")
+ (plain "\\begin{columns}[t]
+\\column{.5\\textwidth}")
+ (plain "\\vspace{-1em}")
  (itemize
-  :title "Thanks to \\ct{#lisp} for all their help:"
   "akovalenko"
   "antifuchs"
   "H4ns"
-  "nikodemus"
+  "nikodemus")
+ (plain "\\column{.5\\textwidth}")
+ (plain "\\vspace{-1em}")
+ (itemize
   "pjb"
   "prxb"
-  "ThomasH"
-  "")
- (plain "\\vspace{-1em}")
- (text "https://github.com/DamienCassou/DSLides"))
+  "ThomasH" "")
+ (plain "\\end{columns}")
+ (text "These slides were created with a Common Lisp DSL:
+\\textit{https://github.com/DamienCassou/DSLides}"))
